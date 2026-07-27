@@ -14,7 +14,9 @@ pub enum Method {
     TRACE,
     PATCH,
 }
-
+/// Реализация FromStr для метода HTTP
+///
+/// Implementation of FromStr for HTTP method
 impl FromStr for Method {
     type Err = MethodError;
 
@@ -33,5 +35,7 @@ impl FromStr for Method {
         }
     }
 }
-
+/// Ошибка при разборе метода HTTP
+///
+/// Error when parsing HTTP method
 pub struct MethodError;
