@@ -1,37 +1,23 @@
-//! HTTP request methods and method parsing.
-
 use std::{error::Error, fmt, str::FromStr};
 
-/// A standard HTTP request method.
+/// Стандартный метод HTTP-запроса.
 ///
-/// Method names are represented as idiomatic Rust enum variants. On the wire,
-/// they are parsed from their case-sensitive uppercase representation, such as
-/// `GET` or `POST`.
+/// A standard HTTP request method.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
-    /// Requests a representation of the target resource.
     Get,
-    /// Removes the target resource.
     Delete,
-    /// Submits data to the target resource.
     Post,
-    /// Creates or replaces the target resource with the request content.
     Put,
-    /// Requests the response headers without a response body.
     Head,
-    /// Establishes a tunnel to the target server.
     Connect,
-    /// Requests the communication options available for the target resource.
     Options,
-    /// Performs a diagnostic loopback of the request.
     Trace,
-    /// Applies partial modifications to the target resource.
     Patch,
 }
 
-/// Parses a case-sensitive HTTP method token.
-///
-/// # Errors
+/// Возвращает [`MethodError`], если входная строка не является именем одного из
+/// поддерживаемых стандартных методов.
 ///
 /// Returns [`MethodError`] when the input is not one of the supported standard
 /// method names.
@@ -53,7 +39,8 @@ impl FromStr for Method {
         }
     }
 }
-/// An error returned when an HTTP method cannot be parsed.
+/// Ошибка сохраняет неподдерживаемый токен метода, чтобы его можно было
+/// включить в диагностическое сообщение или преобразовать в HTTP-ответ.
 ///
 /// The error retains the unsupported method token so it can be included in
 /// diagnostics or mapped to an HTTP response.
@@ -61,6 +48,8 @@ impl FromStr for Method {
 pub struct MethodError(String);
 
 impl MethodError {
+    /// Возвращает неподдерживаемый токен метода, переданный парсеру.
+    ///
     /// Returns the unsupported method token supplied to the parser.
     pub fn invalid_method(&self) -> &str {
         &self.0
@@ -74,3 +63,25 @@ impl fmt::Display for MethodError {
 }
 
 impl Error for MethodError {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_get_method() {
+        assert_eq!("GET".parse::<Method>(), Ok(Method::Get));
+    }
+
+    #[test]
+    fn rejects_unknown_methods() {
+        let error = "UNKNOWN".parse::<Method>().unwrap_err();
+        assert_eq!(error.invalid_method(), "UNKNOWN")
+    }
+
+    #[test]
+    fn rejects_lowercase_method() {
+        let error = "get".parse::<Method>().unwrap_err();
+        assert_eq!(error.invalid_method(), "get");
+    }
+}
