@@ -1,18 +1,19 @@
-use std::str::FromStr;
+use std::{error::Error, fmt, str::FromStr};
+
 /// Добавлены все методы HTTP
 ///
 /// Added all HTTP methods
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
-    GET,
-    DELETE,
-    POST,
-    PUT,
-    HEAD,
-    CONNECT,
-    OPTIONS,
-    TRACE,
-    PATCH,
+    Get,
+    Delete,
+    Post,
+    Put,
+    Head,
+    Connect,
+    Options,
+    Trace,
+    Patch,
 }
 /// Реализация FromStr для метода HTTP
 ///
@@ -22,20 +23,35 @@ impl FromStr for Method {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "GET" => Ok(Self::GET),
-            "DELETE" => Ok(Self::DELETE),
-            "POST" => Ok(Self::POST),
-            "PUT" => Ok(Self::PUT),
-            "HEAD" => Ok(Self::HEAD),
-            "CONNECT" => Ok(Self::CONNECT),
-            "OPTIONS" => Ok(Self::OPTIONS),
-            "TRACE" => Ok(Self::TRACE),
-            "PATCH" => Ok(Self::PATCH),
-            _ => Err(MethodError),
+            "GET" => Ok(Self::Get),
+            "DELETE" => Ok(Self::Delete),
+            "POST" => Ok(Self::Post),
+            "PUT" => Ok(Self::Put),
+            "HEAD" => Ok(Self::Head),
+            "CONNECT" => Ok(Self::Connect),
+            "OPTIONS" => Ok(Self::Options),
+            "TRACE" => Ok(Self::Trace),
+            "PATCH" => Ok(Self::Patch),
+            invalid => Err(MethodError(invalid.to_owned())),
         }
     }
 }
 /// Ошибка при разборе метода HTTP
 ///
 /// Error when parsing HTTP method
-pub struct MethodError;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MethodError(String);
+
+impl MethodError {
+    pub fn invalid_method(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for MethodError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "unsupported HTTP method: {}", self.0)
+    }
+}
+
+impl Error for MethodError {}
