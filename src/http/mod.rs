@@ -7,3 +7,5 @@ pub mod error;
 ///
 /// HTTP request methods and their parser.
 pub mod method;
+
+pub mod status_code;
