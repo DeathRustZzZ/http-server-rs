@@ -1,5 +1,7 @@
 use std::str::FromStr;
-
+/// Добавлены все методы HTTP
+///
+/// Added all HTTP methods
 #[derive(Debug)]
 pub enum Method {
     GET,
