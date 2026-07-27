@@ -12,3 +12,8 @@ pub mod method;
 ///
 /// HTTP response status codes.
 pub mod status_code;
+
+/// HTTP-ответ и его запись в поток.
+///
+/// HTTP response and its serialization to a stream.
+pub mod response;
