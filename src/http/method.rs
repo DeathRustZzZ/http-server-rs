@@ -1,23 +1,40 @@
+//! HTTP request methods and method parsing.
+
 use std::{error::Error, fmt, str::FromStr};
 
-/// Добавлены все методы HTTP
+/// A standard HTTP request method.
 ///
-/// Added all HTTP methods
+/// Method names are represented as idiomatic Rust enum variants. On the wire,
+/// they are parsed from their case-sensitive uppercase representation, such as
+/// `GET` or `POST`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
+    /// Requests a representation of the target resource.
     Get,
+    /// Removes the target resource.
     Delete,
+    /// Submits data to the target resource.
     Post,
+    /// Creates or replaces the target resource with the request content.
     Put,
+    /// Requests the response headers without a response body.
     Head,
+    /// Establishes a tunnel to the target server.
     Connect,
+    /// Requests the communication options available for the target resource.
     Options,
+    /// Performs a diagnostic loopback of the request.
     Trace,
+    /// Applies partial modifications to the target resource.
     Patch,
 }
-/// Реализация FromStr для метода HTTP
+
+/// Parses a case-sensitive HTTP method token.
 ///
-/// Implementation of FromStr for HTTP method
+/// # Errors
+///
+/// Returns [`MethodError`] when the input is not one of the supported standard
+/// method names.
 impl FromStr for Method {
     type Err = MethodError;
 
@@ -36,13 +53,15 @@ impl FromStr for Method {
         }
     }
 }
-/// Ошибка при разборе метода HTTP
+/// An error returned when an HTTP method cannot be parsed.
 ///
-/// Error when parsing HTTP method
+/// The error retains the unsupported method token so it can be included in
+/// diagnostics or mapped to an HTTP response.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MethodError(String);
 
 impl MethodError {
+    /// Returns the unsupported method token supplied to the parser.
     pub fn invalid_method(&self) -> &str {
         &self.0
     }
