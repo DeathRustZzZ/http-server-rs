@@ -8,4 +8,7 @@ pub mod error;
 /// HTTP request methods and their parser.
 pub mod method;
 
+/// Коды состояния HTTP-ответа.
+///
+/// HTTP response status codes.
 pub mod status_code;
